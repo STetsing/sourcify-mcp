@@ -6,7 +6,7 @@ import express from 'express';
 import { randomUUID } from 'crypto';
 
 const mode = process.env.MCP_TRANSPORT || process.argv[2] || 'stdio';
-const PORT = process.env.PORT ? parseInt(process.env.PORT) : 3000;
+const PORT = process.env.PORT ? parseInt(process.env.PORT) : 9002;
 const HOST = process.env.HOST || 'localhost';
 
 async function main() {
