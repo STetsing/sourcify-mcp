@@ -1,5 +1,4 @@
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
-import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprotocol/sdk/types.js';
 import { SourcifyClient } from './clients/index.js';
 import {
@@ -247,11 +246,4 @@ export async function createServer(): Promise<Server> {
   });
 
   return server;
-}
-
-export async function runServer() {
-  const server = await createServer();
-  const transport = new StdioServerTransport();
-  await server.connect(transport);
-  console.error('Sourcify MCP Server running on stdio');
 }
