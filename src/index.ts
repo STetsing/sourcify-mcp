@@ -6,7 +6,7 @@ import express from 'express';
 import { randomUUID } from 'crypto';
 
 const mode = process.env.MCP_TRANSPORT || process.argv[2] || 'stdio';
-const PORT = process.env.PORT ? parseInt(process.env.PORT) : 9002;
+const PORT = process.env.PORT ? parseInt(process.env.PORT) : 9001;
 const HOST = process.env.HOST || 'localhost';
 
 async function main() {
@@ -30,19 +30,19 @@ async function main() {
 
     // MCP endpoint - handles both GET (SSE) and POST (messages)
     app.all('/mcp', async (req, res) => {
-      console.error(`MCP ${req.method} request`);
+      console.log(`MCP ${req.method} request`);
       await transport.handleRequest(req, res, req.body);
     });
 
     app.listen(PORT, HOST, () => {
-      console.error(`Sourcify MCP HTTP Server running on http://${HOST}:${PORT}`);
-      console.error(`MCP endpoint: http://${HOST}:${PORT}/mcp`);
+      console.log(`Sourcify MCP HTTP Server running on http://${HOST}:${PORT}`);
+      console.log(`MCP endpoint: http://${HOST}:${PORT}/mcp`);
     });
   } else {
     // Stdio mode (default)
     const transport = new StdioServerTransport();
     await server.connect(transport);
-    console.error('Sourcify MCP Server running on stdio');
+    console.log('Sourcify MCP Server running on stdio');
   }
 }
 
