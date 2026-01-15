@@ -119,7 +119,7 @@ Add to your MCP client configuration:
   "mcpServers": {
     "sourcify": {
       "command": "node",
-      "args": ["/path/to/remix-mcp-sourcify/dist/index.js"]
+      "args": ["/path/to/sourcify-mcp/dist/index.js"]
     }
   }
 }

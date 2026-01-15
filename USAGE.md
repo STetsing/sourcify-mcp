@@ -24,7 +24,7 @@ Add to your `claude_desktop_config.json`:
     "sourcify": {
       "command": "node",
       "args": [
-        "/Users/pipper/Desktop/work/Remix/remix-mcp-sourcify/dist/index.js"
+        "/Users/pipper/Desktop/work/Remix/sourcify-mcp/dist/index.js"
       ]
     }
   }

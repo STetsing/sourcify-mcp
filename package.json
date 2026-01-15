@@ -1,5 +1,5 @@
 {
-  "name": "remix-mcp-sourcify",
+  "name": "sourcify-mcp",
   "version": "1.0.0",
   "description": "MCP server for Sourcify smart contract verification",
   "main": "dist/index.js",
