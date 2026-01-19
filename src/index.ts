@@ -11,37 +11,52 @@ const PORT = process.env.PORT ? parseInt(process.env.PORT) : 9003;
 const HOST = process.env.HOST || 'localhost';
 
 async function main() {
-  const server = await createServer();
-
-  if (mode === 'http' || mode === 'sse') {
-    // HTTP mode with StreamableHTTPServerTransport
+  if (mode === 'http') {
+    // HTTP mode (POST only)
     const app = express();
 
     app.use(cors({
       origin: '*',
-      methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
-      allowedHeaders: ['Content-Type', 'Accept', 'mcp-session-id'],
+      methods: ['GET', 'POST', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'mcp-session-id'],
       exposedHeaders: ['mcp-session-id'],
       credentials: false
     }));
 
     app.use(express.json());
 
-    const transport = new StreamableHTTPServerTransport({
-      sessionIdGenerator: () => randomUUID(),
-    });
-
-    await server.connect(transport);
+    // Store server and transport instances per session
+    const sessions = new Map<string, { server: Awaited<ReturnType<typeof createServer>>, transport: StreamableHTTPServerTransport }>();
 
     // Health check endpoint
     app.get('/health', (_req, res) => {
       res.json({ status: 'ok' });
     });
 
-    // MCP endpoint - handles both GET (SSE) and POST (messages)
-    app.all('/mcp', async (req, res) => {
-      console.log(`MCP ${req.method} request`);
-      await transport.handleRequest(req, res, req.body);
+    // MCP endpoint - handles POST messages only
+    app.post('/mcp', async (req, res) => {
+      console.log(`MCP POST request`);
+
+      // Get or create session ID
+      let sessionId = req.headers['mcp-session-id'] as string;
+      if (!sessionId) {
+        sessionId = randomUUID();
+      }
+
+      // Get or create session
+      let session = sessions.get(sessionId);
+      if (!session) {
+        console.log(`Creating new session: ${sessionId}`);
+        const server = await createServer();
+        const transport = new StreamableHTTPServerTransport({
+          sessionIdGenerator: () => sessionId,
+        });
+        await server.connect(transport);
+        session = { server, transport };
+        sessions.set(sessionId, session);
+      }
+
+      await session.transport.handleRequest(req, res, req.body);
     });
 
     app.listen(PORT, HOST, () => {
@@ -50,6 +65,7 @@ async function main() {
     });
   } else {
     // Stdio mode (default)
+    const server = await createServer();
     const transport = new StdioServerTransport();
     await server.connect(transport);
     console.log('Sourcify MCP Server running on stdio');
