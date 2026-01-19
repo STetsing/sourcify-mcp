@@ -17,7 +17,6 @@ async function main() {
     // HTTP mode with StreamableHTTPServerTransport
     const app = express();
 
-    // Enable CORS for all routes
     app.use(cors({
       origin: '*',
       methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
