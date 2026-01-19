@@ -3,6 +3,7 @@ import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { createServer } from './server.js';
 import express from 'express';
+import cors from 'cors';
 import { randomUUID } from 'crypto';
 
 const mode = process.env.MCP_TRANSPORT || process.argv[2] || 'stdio';
@@ -15,6 +16,16 @@ async function main() {
   if (mode === 'http' || mode === 'sse') {
     // HTTP mode with StreamableHTTPServerTransport
     const app = express();
+
+    // Enable CORS for all routes
+    app.use(cors({
+      origin: '*',
+      methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'Accept', 'mcp-session-id'],
+      exposedHeaders: ['mcp-session-id'],
+      credentials: false
+    }));
+
     app.use(express.json());
 
     const transport = new StreamableHTTPServerTransport({
